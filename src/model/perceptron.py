@@ -56,9 +56,16 @@ class Perceptron(Classifier):
         verbose : boolean
             Print logging messages with validation accuracy if verbose is True.
         """
-        
-        # Write your code to train the perceptron here
-        pass
+
+        for epoch in range(self.epochs):
+            for dataLine, isSeven in zip(self.trainingSet.input, self.trainingSet.label):
+                classifiedAsSeven = self.classify(dataLine)
+
+                if(classifiedAsSeven != isSeven):
+                    self.updateWeights(dataLine, isSeven - classifiedAsSeven)
+            break
+
+
 
     def classify(self, testInstance):
         """Classify a single instance.
@@ -72,8 +79,9 @@ class Perceptron(Classifier):
         bool :
             True if the testInstance is recognized as a 7, False otherwise.
         """
-        # Write your code to do the classification on an input image
-        pass
+        return self.fire(testInstance)
+
+
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
@@ -95,8 +103,7 @@ class Perceptron(Classifier):
         return list(map(self.classify, test))
 
     def updateWeights(self, input, error):
-        # Write your code to update the weights of the perceptron here
-        pass
+        self.weight += self.learningRate * sum(input) * error
          
     def fire(self, input):
         """Fire the output of the perceptron corresponding to the input """
