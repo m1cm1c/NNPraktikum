@@ -36,7 +36,7 @@ class Perceptron(Classifier):
     """
     def __init__(self, train, valid, test, 
                                     learningRate=0.01, epochs=50):
-
+        
         self.learningRate = learningRate
         self.epochs = epochs
 
@@ -47,6 +47,7 @@ class Perceptron(Classifier):
         # Initialize the weight vector with small random values
         # around 0 and0.1
         self.weight = np.random.rand(self.trainingSet.input.shape[1])/100
+        self.weight = np.insert(self.weight, 0, np.random.rand()/10)
 
     def train(self, verbose=True):
         """Train the perceptron with the perceptron learning algorithm.
@@ -61,8 +62,11 @@ class Perceptron(Classifier):
             for dataLine, isSeven in zip(self.trainingSet.input, self.trainingSet.label):
                 classifiedAsSeven = self.classify(dataLine)
 
-                if(classifiedAsSeven != isSeven):
-                    self.updateWeights(dataLine, isSeven - classifiedAsSeven)
+                if classifiedAsSeven != isSeven:
+                    if isSeven == 0:
+                        self.updateWeights(dataLine, (int) (classifiedAsSeven - isSeven))
+                    else:
+                        self.updateWeights(dataLine, (int) (classifiedAsSeven - isSeven))
             break
 
 
@@ -79,6 +83,7 @@ class Perceptron(Classifier):
         bool :
             True if the testInstance is recognized as a 7, False otherwise.
         """
+        testInstance = np.insert(testInstance, 0, 1)
         return self.fire(testInstance)
 
 
@@ -103,8 +108,9 @@ class Perceptron(Classifier):
         return list(map(self.classify, test))
 
     def updateWeights(self, input, error):
-        self.weight += self.learningRate * sum(input) * error
-         
+        print input
+        self.weight += self.learningRate*error*input
+        
     def fire(self, input):
         """Fire the output of the perceptron corresponding to the input """
         return Activation.sign(np.dot(np.array(input), self.weight))
