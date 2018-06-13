@@ -27,15 +27,15 @@ def main():
     myMLP = MultilayerPerceptron(data.trainingSet,
                                         data.validationSet,
                                         data.testSet,
-                                        learningRate=0.005,
-                                        epochs=30, loss='mse', outputActivation='sigmoid')
+                                        learningRate=0.05,
+                                        epochs=300, loss='mse', outputActivation='sigmoid')
 
                                         
-    myLRClassifier = LogisticRegression(data.trainingSet,
-                                        data.validationSet,
-                                        data.testSet,
-                                        learningRate=0.005,
-                                        epochs=30)
+    # myLRClassifier = LogisticRegression(data.trainingSet,
+    #                                     data.validationSet,
+    #                                     data.testSet,
+    #                                     learningRate=0.005,
+    #                                     epochs=30)
                                         
     
     # Report the result #
@@ -91,9 +91,9 @@ def main():
     evaluator.printAccuracy(data.testSet, MLPPred)
 
     # Draw
-    plot = PerformancePlot("Logistic Regression validation")
-    plot.draw_performance_epoch(MLPPred.performances,
-                                MLPPred.epochs)
+    # plot = PerformancePlot("Logistic Regression validation")
+    # plot.draw_performance_epoch(MLPPred.performances,
+    #                             MLPPred.epochs)
 
 
     

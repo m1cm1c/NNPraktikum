@@ -79,18 +79,16 @@ class MultilayerPerceptron(Classifier):
                            None, inputActivation, False))
 
         # Output layer
-        outputActivation = "softmax"
+        outputActivation = outputActivation
         self.layers.append(LogisticLayer(128, 10, 
                            None, outputActivation, True))
 
         self.inputWeights = inputWeights
 
         # add bias values ("1"s) at the beginning of all data sets
-       # self.trainingSet.input = np.insert(self.trainingSet.input, 0, 1,
-#                                            axis=1)
-      #  self.validationSet.input = np.insert(self.validationSet.input, 0, 1,
-       #                                       axis=1)
-     #   self.testSet.input = np.insert(self.testSet.input, 0, 1, axis=1)
+        self.trainingSet.input = np.insert(self.trainingSet.input, 0, 1,axis=1)
+        self.validationSet.input = np.insert(self.validationSet.input, 0, 1, axis=1)
+        self.testSet.input = np.insert(self.testSet.input, 0, 1, axis=1)
 
 
     def _get_layer(self, layer_index):
@@ -152,7 +150,8 @@ class MultilayerPerceptron(Classifier):
                 tempWeights = layer.weights
                 tempDerivatives = layer.deltas
             else:
-                layer.computeDerivative(tempDerivatives, tempWeights)
+                #layer.computeDerivative(tempDerivatives, np.transpose(tempWeights[1:]))
+                layer.computeDerivative(tempDerivatives, tempWeights[1:])
 
             layer.updateWeights(self.learningRate)
 
