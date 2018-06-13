@@ -79,9 +79,8 @@ class MultilayerPerceptron(Classifier):
                            None, inputActivation, False))
 
         # Output layer
-        outputActivation = outputActivation
         self.layers.append(LogisticLayer(128, 10, 
-                           None, outputActivation, True))
+                           None, self.outputActivation, True))
 
         self.inputWeights = inputWeights
 
