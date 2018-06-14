@@ -47,8 +47,6 @@ class MultilayerPerceptron(Classifier):
         self.trainingSet = train
         self.validationSet = valid
         self.testSet = test
-
-
         
         if loss == 'bce':
             self.loss = BinaryCrossEntropyError()
@@ -60,6 +58,8 @@ class MultilayerPerceptron(Classifier):
             self.loss = DifferentError()
         elif loss == 'absolute':
             self.loss = AbsoluteError()
+        elif loss == CrossEntropyError.errorString:
+            self.loss = CrossEntropyError()
         else:
             raise ValueError('There is no predefined loss function ' +
                              'named ' + str)
@@ -78,6 +78,10 @@ class MultilayerPerceptron(Classifier):
         self.layers.append(LogisticLayer(train.input.shape[1], 128, 
                            None, inputActivation, False))
 
+        # Hidden layer
+        self.layers.append(LogisticLayer(128, 128, 
+                           None, inputActivation, True))
+
         # Output layer
         self.layers.append(LogisticLayer(128, 10, 
                            None, self.outputActivation, True))
@@ -88,7 +92,6 @@ class MultilayerPerceptron(Classifier):
         self.trainingSet.input = np.insert(self.trainingSet.input, 0, 1,axis=1)
         self.validationSet.input = np.insert(self.validationSet.input, 0, 1, axis=1)
         self.testSet.input = np.insert(self.testSet.input, 0, 1, axis=1)
-
 
     def _get_layer(self, layer_index):
         return self.layers[layer_index]
@@ -113,13 +116,10 @@ class MultilayerPerceptron(Classifier):
         """
         input = inp
 
-
         for layer in self.layers:
             if layer != self._get_input_layer():
                 input = np.insert(input, 0, 1)
             input = layer.forward(input)
-
-
 
         return input
 
@@ -133,27 +133,23 @@ class MultilayerPerceptron(Classifier):
             a numpy array (1,nOut) containing the output of the layer
         """
         output = self._get_output_layer().outp
-        return self.loss.calculateError(target, output)
+        return self.loss.calculateError(self._get_encoded_label(target), output)
     
     def _update_weights(self, learningRate, label):
         """
         Update the weights of the layers by propagating back the error
         """
-
         tempWeights = None
         tempDerivatives = None
         for layer in reversed(self.layers):
             if layer == self._get_output_layer():
-
                 layer.computeDerivative(self.loss.calculateDerivative(label, layer.outp), 1.0)
                 tempWeights = layer.weights
                 tempDerivatives = layer.deltas
             else:
-                #layer.computeDerivative(tempDerivatives, np.transpose(tempWeights[1:]))
                 layer.computeDerivative(tempDerivatives, tempWeights[1:])
 
             layer.updateWeights(self.learningRate)
-
         
     def train(self, verbose=True):
         """Train the Multi-layer Perceptrons
@@ -183,17 +179,11 @@ class MultilayerPerceptron(Classifier):
                       .format(accuracy * 100))
                 print("-----------------------------")
 
-
-
     def classify(self, test_instance):
         # Classify an instance given the model of the classifier
         # You need to implement something here
-
-        outputVector = self._feed_forward(test_instance)
-
-
-        return np.argmax(outputVector)
-
+        outp = self._feed_forward(test_instance)
+        return np.argmax(outp)
 
     def evaluate(self, test=None):
         """Evaluate a whole dataset.
@@ -212,18 +202,17 @@ class MultilayerPerceptron(Classifier):
             test = self.testSet.input
         # Once you can classify an instance, just use map for all of the test
         # set.
-        return list(map(self.classify, test))
+        return list(map(self.classify, test))        
 
     def _train_one_epoch(self):
-
         for label, data in zip(self.trainingSet.label, self.trainingSet.input):
-            #data = np.insert(data, 0, 1)
-
-
-           # print(len(data))
             self._feed_forward(data)
-            self._update_weights(self.learningRate, label)
+            self._update_weights(self.learningRate, self._get_encoded_label(label))
 
+    def _get_encoded_label(self, label):
+        zeros = np.zeros(10)
+        zeros[label] = 1
+        return zeros
 
     def __del__(self):
         # Remove the bias from input data
