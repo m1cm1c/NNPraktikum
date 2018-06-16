@@ -123,12 +123,7 @@ class CrossEntropyError(Error):
 
     def calculateError(self, target, output):
         # https://datascience.stackexchange.com/questions/20296/cross-entropy-loss-explanation
-        sum = 0
-        for out in output:
-            if np.argmax(output) == target:
-                sum += log(out)
-
-        return -sum
+        return -log(np.dot(target, output))
         
     def calculateDerivative(self, target, output):
         # https://deepnotes.io/softmax-crossentropy

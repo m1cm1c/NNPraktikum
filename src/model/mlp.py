@@ -58,11 +58,11 @@ class MultilayerPerceptron(Classifier):
             self.loss = DifferentError()
         elif loss == 'absolute':
             self.loss = AbsoluteError()
-        elif loss == CrossEntropyError.errorString:
+        elif loss == 'crossentropy':
             self.loss = CrossEntropyError()
         else:
             raise ValueError('There is no predefined loss function ' +
-                             'named ' + str)
+                             'named ' + loss)
 
         # Record the performance of each epoch for later usages
         # e.g. plotting, reporting..

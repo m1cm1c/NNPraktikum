@@ -4,11 +4,7 @@
 Activation functions which can be used within neurons.
 """
 
-from numpy import exp
-from numpy import divide
-from numpy import ones
-from numpy import asarray
-
+import numpy as np
 
 class Activation:
     """
@@ -22,7 +18,7 @@ class Activation:
     @staticmethod
     def sigmoid(netOutput):
         # use e^x from numpy to avoid overflow
-        return 1/(1+exp(-1.0*netOutput))
+        return 1/(1+np.exp(-1.0*netOutput))
 
     @staticmethod
     def sigmoidPrime(netOutput):
@@ -33,8 +29,8 @@ class Activation:
     @staticmethod
     def tanh(netOutput):
         # return 2*Activation.sigmoid(2*netOutput)-1
-        ex = exp(1.0*netOutput)
-        exn = exp(-1.0*netOutput)
+        ex = np.exp(1.0*netOutput)
+        exn = np.exp(-1.0*netOutput)
         return divide(ex-exn, ex+exn)  # element-wise division
 
     @staticmethod
@@ -64,13 +60,22 @@ class Activation:
     @staticmethod
     def softmax(netOutput):
         # Here you have to code the softmax function
-        exps = [np.exp(out) for out in netOutput]
+        # exps = [np.exp(out) for out in netOutput]
+        # update for numerical stability (avoid overflows)
+        exps = [np.exp(out - np.max(netOutput)) for out in netOutput]
         return exps / np.sum(exps)
         
     @staticmethod
     def softmaxPrime(netOutput):
         # Here you have to code the softmax function
-        return netOutput * (1.0 - netOutput)
+        # https://deepnotes.io/softmax-crossentropy
+        i = np.argmax(netOutput)
+        pi = netOutput[i]
+
+        retOutput = pi * netOutput
+        retOutput[i] = pi * (1 - pi)
+
+        return retOutput
         
     @staticmethod
     def getActivation(str):
