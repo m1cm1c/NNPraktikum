@@ -79,8 +79,8 @@ class MultilayerPerceptron(Classifier):
                            None, inputActivation, False))
 
         # Hidden layer
-        self.layers.append(LogisticLayer(128, 128, 
-                           None, inputActivation, True))
+#        self.layers.append(LogisticLayer(128, 128, 
+#                           None, inputActivation, True))
 
         # Output layer
         self.layers.append(LogisticLayer(128, 10, 
