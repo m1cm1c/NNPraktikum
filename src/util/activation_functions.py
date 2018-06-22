@@ -69,13 +69,7 @@ class Activation:
     def softmaxPrime(netOutput):
         # Here you have to code the softmax function
         # https://deepnotes.io/softmax-crossentropy
-        i = np.argmax(netOutput)
-        pi = netOutput[i]
-
-        retOutput = pi * netOutput
-        retOutput[i] = pi * (1 - pi)
-
-        return retOutput
+        return netOutput * (1 - netOutput)
         
     @staticmethod
     def getActivation(str):
