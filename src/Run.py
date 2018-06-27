@@ -28,8 +28,9 @@ def main():
     myMLP = MultilayerPerceptron(data.trainingSet,
                                         data.validationSet,
                                         data.testSet,
-                                        learningRate=0.05,
-                                        epochs=30,
+                                        learningRate=0.1,
+                                        weightDecayRate=0.00000001,
+                                        epochs=50,
                                         loss='crossentropy',
                                         outputActivation='softmax')
 
@@ -95,8 +96,8 @@ def main():
 
     # Draw
     plot = PerformancePlot("MLP validation")
-    plot.draw_performance_epoch(myMLP.performances,
-                                myMLP.epochs)
+    plot.draw_performance_epoch(myMLP.performancesTraining,
+                                myMLP.performancesValidation, myMLP.epochs)
 
 
     

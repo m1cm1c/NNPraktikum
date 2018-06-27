@@ -16,7 +16,7 @@ class MultilayerPerceptron(Classifier):
 
     def __init__(self, train, valid, test, layers=None, inputWeights=None,
                  outputTask='classification', outputActivation='softmax',
-                 loss='bce', learningRate=0.01, epochs=50):
+                 loss='bce', learningRate=0.01, weightDecayRate=0, epochs=50):
 
         """
         A MNIST recognizer based on multi-layer perceptron algorithm
@@ -27,6 +27,7 @@ class MultilayerPerceptron(Classifier):
         valid : list
         test : list
         learningRate : float
+        weightDecayRate : float
         epochs : positive int
 
         Attributes
@@ -35,11 +36,14 @@ class MultilayerPerceptron(Classifier):
         validationSet : list
         testSet : list
         learningRate : float
+        weightDecayRate : float
         epochs : positive int
-        performances: array of floats
+        performancesTraining: array of floats
+        performancesValidation: array of floats
         """
 
         self.learningRate = learningRate
+        self.weightDecayRate = weightDecayRate
         self.epochs = epochs
         self.outputTask = outputTask  # Either classification or regression
         self.outputActivation = outputActivation
@@ -66,7 +70,8 @@ class MultilayerPerceptron(Classifier):
 
         # Record the performance of each epoch for later usages
         # e.g. plotting, reporting..
-        self.performances = []
+        self.performancesTraining = []
+        self.performancesValidation = []
 
         self.layers = layers
 
@@ -149,7 +154,7 @@ class MultilayerPerceptron(Classifier):
             else:
                 layer.computeDerivative(tempDerivatives, tempWeights[1:])
 
-            layer.updateWeights(self.learningRate)
+            layer.updateWeights(self.learningRate, self.weightDecayRate)
         
     def train(self, verbose=True):
         """Train the Multi-layer Perceptrons
@@ -169,15 +174,20 @@ class MultilayerPerceptron(Classifier):
 
             self._train_one_epoch()
 
-            accuracy = accuracy_score(self.validationSet.label,
+            accuracyTraining = accuracy_score(self.trainingSet.label,
+                                        self.evaluate(self.trainingSet))
+            accuracyValidation = accuracy_score(self.validationSet.label,
                                         self.evaluate(self.validationSet))
             # Record the performance of each epoch for later usages
             # e.g. plotting, reporting..
-            self.performances.append(accuracy)
+            self.performancesTraining.append(accuracyTraining)
+            self.performancesValidation.append(accuracyValidation)
 
             if verbose:
+                print("Accuracy on training: {0:.2f}%"
+                      .format(accuracyTraining * 100))
                 print("Accuracy on validation: {0:.2f}%"
-                      .format(accuracy * 100))
+                      .format(accuracyValidation * 100))
                 print("-----------------------------")
 
     def classify(self, test_instance):
