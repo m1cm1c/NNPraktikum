@@ -145,23 +145,28 @@ class MultilayerPerceptron(Classifier):
         ndarray :
             a numpy array (1,nOut) containing the output of the layer
         """
-        output = self._get_output_layer().outp
-        return self.loss.calculateError(self._get_encoded_label(target), output)
-    
-    def _update_weights(self, learningRate, label):
-        """
-        Update the weights of the layers by propagating back the error
-        """
+
         tempWeights = None
         tempDerivatives = None
+
         for layer in reversed(self.layers):
             if layer == self._get_output_layer():
-                layer.computeDerivative(self.loss.calculateDerivative(label, layer.outp), 1.0)
+                layer.computeDerivative(self.loss.calculateDerivative(target, layer.outp), 1.0)
             else:
                 layer.computeDerivative(tempDerivatives, tempWeights[1:])
+
             tempWeights = layer.weights
             tempDerivatives = layer.deltas
 
+        output = self._get_output_layer().outp
+        return self.loss.calculateError(target, output)
+    
+    def _update_weights(self, learningRate):
+        """
+        Update the weights of the layers by propagating back the error
+        """
+
+        for layer in reversed(self.layers):
             layer.updateWeights(self.learningRate, self.weightDecayRate)
         
     def train(self, verbose=True):
@@ -226,7 +231,8 @@ class MultilayerPerceptron(Classifier):
     def _train_one_epoch(self):
         for label, data in zip(self.trainingSet.label, self.trainingSet.input):
             self._feed_forward(data)
-            self._update_weights(self.learningRate, self._get_encoded_label(label))
+            self._compute_error(self._get_encoded_label(label))
+            self._update_weights(self.learningRate)
 
     def _get_encoded_label(self, label):
         zeros = np.zeros(10)
