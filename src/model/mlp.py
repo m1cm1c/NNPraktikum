@@ -158,8 +158,7 @@ class MultilayerPerceptron(Classifier):
             if layer == self._get_output_layer():
                 layer.computeDerivative(self.loss.calculateDerivative(label, layer.outp), 1.0)
             else:
-                layer.computeDerivative(tempDerivatives, tempWeights[1:].T)
-
+                layer.computeDerivative(tempDerivatives, tempWeights[1:])
             tempWeights = layer.weights
             tempDerivatives = layer.deltas
 
