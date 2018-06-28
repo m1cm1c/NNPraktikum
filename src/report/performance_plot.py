@@ -14,7 +14,7 @@ class PerformancePlot(object):
         self.name = name
 
     def draw_performance_epoch(self, performancesTraining, performancesValidation,
-                               epochs, learningRate, weightDecayRate):
+                               epochs, learningRate=0, weightDecayRate=0, show=True):
         plt.plot(range(epochs), performancesTraining, 'k',
                  range(epochs), performancesTraining, 'bo')
         plt.plot(range(epochs), performancesValidation, 'k',
@@ -23,7 +23,11 @@ class PerformancePlot(object):
         plt.ylim(ymax=1)
         plt.ylabel("Accuracy")
         plt.xlabel("Epoch")
-        plt.savefig("../plots/Learning Rate " + str(learningRate)
-                 + ", Weight Decay Rate " + str(weightDecayRate)
-                 + ".png")
+
+        if show:
+            plt.show()
+        else:
+            plt.savefig("../plots/Learning Rate " + str(learningRate)
+                    + ", Weight Decay Rate " + str(weightDecayRate)
+                    + ".png")
         plt.clf()

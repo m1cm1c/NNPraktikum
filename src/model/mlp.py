@@ -73,23 +73,31 @@ class MultilayerPerceptron(Classifier):
         self.performancesTraining = []
         self.performancesValidation = []
 
-        self.layers = layers
-
-        # Build up the network from specific layers
         self.layers = []
 
-        # Input layer
-        inputActivation = "sigmoid"
-        self.layers.append(LogisticLayer(train.input.shape[1], 128, 
-                           None, inputActivation, False))
+        # Build up the network from specific layers
+        if not layers:
+            # Input layer
+            inputActivation = "sigmoid"
+            self.layers.append(LogisticLayer(train.input.shape[1], 128,
+                            None, inputActivation, False))
 
-        # Hidden layer
-#        self.layers.append(LogisticLayer(128, 128, 
-#                           None, inputActivation, True))
+            # Output layer
+            self.layers.append(LogisticLayer(128, 10,
+                            None, self.outputActivation, True))
 
-        # Output layer
-        self.layers.append(LogisticLayer(128, 10, 
-                           None, self.outputActivation, True))
+        else:
+            inputActivation = "sigmoid"
+
+            nIn = train.input.shape[1]
+
+            for layer in layers:
+                self.layers.append(LogisticLayer(nIn, layer,
+                            None, inputActivation, False))
+                nIn = layer
+
+            self.layers.append(LogisticLayer(nIn, 10,
+                        None, self.outputActivation, True))
 
         self.inputWeights = inputWeights
 
@@ -149,10 +157,11 @@ class MultilayerPerceptron(Classifier):
         for layer in reversed(self.layers):
             if layer == self._get_output_layer():
                 layer.computeDerivative(self.loss.calculateDerivative(label, layer.outp), 1.0)
-                tempWeights = layer.weights
-                tempDerivatives = layer.deltas
             else:
-                layer.computeDerivative(tempDerivatives, tempWeights[1:])
+                layer.computeDerivative(tempDerivatives, tempWeights[1:].T)
+
+            tempWeights = layer.weights
+            tempDerivatives = layer.deltas
 
             layer.updateWeights(self.learningRate, self.weightDecayRate)
         

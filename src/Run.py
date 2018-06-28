@@ -28,9 +28,10 @@ def main():
     myMLP = MultilayerPerceptron(data.trainingSet,
                                         data.validationSet,
                                         data.testSet,
-                                        learningRate=0.1,
-                                        weightDecayRate=0.00000001,
-                                        epochs=50,
+                                        layers=[256, 128, 64],
+                                        learningRate=0.2,
+                                        #weightDecayRate=0.0000000001,
+                                        epochs=30,
                                         loss='crossentropy',
                                         outputActivation='softmax')
 
