@@ -22,7 +22,7 @@ class Evaluator:
 
     def printComparison(self, testSet, pred):
         for label, result in zip(testSet.label, pred):
-            print("Label: %r. Prediction: %r" % (bool(label), bool(result)))
+            print("Label: %r. Prediction: %r" % ((label), (result)))
 
     def printClassificationResult(self, testSet, pred, targetNames):
         print(classification_report(testSet.label,

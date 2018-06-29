@@ -92,7 +92,7 @@ def main():
   #  evaluator.printAccuracy(data.testSet, lrPred)
 
     print("Result of the mlp recognizer:")
-    #evaluator.printComparison(data.testSet, MLPPred)
+    evaluator.printComparison(data.testSet, MLPPred)
     evaluator.printAccuracy(data.testSet, MLPPred)
 
     # Draw
