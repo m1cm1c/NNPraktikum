@@ -29,9 +29,9 @@ def main():
                                         data.validationSet,
                                         data.testSet,
                                         layers=[256, 128, 64],
-                                        learningRate=0.2,
-                                        #weightDecayRate=0.0000000001,
-                                        epochs=30,
+                                        learningRate=0.4,
+                                        weightDecayRate=0.00000001,
+                                        epochs=20,
                                         loss='crossentropy',
                                         outputActivation='softmax')
 
