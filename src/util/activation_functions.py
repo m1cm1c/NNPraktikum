@@ -31,7 +31,7 @@ class Activation:
         # return 2*Activation.sigmoid(2*netOutput)-1
         ex = np.exp(1.0*netOutput)
         exn = np.exp(-1.0*netOutput)
-        return divide(ex-exn, ex+exn)  # element-wise division
+        return np.divide(ex-exn, ex+exn)  # element-wise division
 
     @staticmethod
     def tanhPrime(netOutput):
@@ -40,13 +40,26 @@ class Activation:
 
     @staticmethod
     def rectified(netOutput):
-        return asarray([max(0.0, i) for i in netOutput])
+        # leaky relu as normal relu seems to be too aggressive
+        # and easily kills the neurons
+        return np.asarray([max(0.00, i) for i in netOutput])
 
     @staticmethod
     def rectifiedPrime(netOutput):
         # reluPrime=1 if netOutput > 0 otherwise 0
-        #print(type(netOutput))
-        return netOutput>0
+        return netOutput > 0
+
+    @staticmethod
+    def leakyRectified(netOutput):
+        # leaky relu as normal relu seems to be too aggressive
+        # and easily kills the neurons
+        return np.asarray([max(0.01*i, i) for i in netOutput])
+
+    @staticmethod
+    def leakyRectifiedPrime(netOutput):
+        # leaky relu as normal relu seems to be too aggressive
+        # and easily kills the neurons
+        return np.asarray([1.0 if out > 0 else 0.01 for out in netOutput])
 
     @staticmethod
     def identity(netOutput):
@@ -87,6 +100,8 @@ class Activation:
             return Activation.rectified
         elif str == 'linear':
             return Activation.identity
+        elif str == 'lrelu':
+            return Activation.leakyRectified
         else:
             raise ValueError('Unknown activation function: ' + str)
 
@@ -107,6 +122,8 @@ class Activation:
             return Activation.rectifiedPrime
         elif str == 'linear':
             return Activation.identityPrime
+        elif str == 'lrelu':
+            return Activation.leakyRectifiedPrime
         else:
             raise ValueError('Cannot get the derivative of'
                              ' the activation function: ' + str)

@@ -15,8 +15,10 @@ class MultilayerPerceptron(Classifier):
     """
 
     def __init__(self, train, valid, test, layers=None, inputWeights=None,
-                 outputTask='classification', outputActivation='softmax',
-                 loss='bce', learningRate=0.01, weightDecayRate=0, epochs=50):
+                 outputTask='classification', inputActivation='sigmoid',
+                 outputActivation='softmax', loss='bce',
+                 learningRate=0.01, weightDecayRate=0, earlyStoppingEpochs=2,
+                 epochs=50):
 
         """
         A MNIST recognizer based on multi-layer perceptron algorithm
@@ -26,8 +28,11 @@ class MultilayerPerceptron(Classifier):
         train : list
         valid : list
         test : list
+        inputActivation : string
+        outputActivation : string
         learningRate : float
         weightDecayRate : float
+        earlyStopping : positive int
         epochs : positive int
 
         Attributes
@@ -35,6 +40,8 @@ class MultilayerPerceptron(Classifier):
         trainingSet : list
         validationSet : list
         testSet : list
+        inputActivation : string
+        outputActivation : string
         learningRate : float
         weightDecayRate : float
         epochs : positive int
@@ -46,7 +53,9 @@ class MultilayerPerceptron(Classifier):
         self.weightDecayRate = weightDecayRate
         self.epochs = epochs
         self.outputTask = outputTask  # Either classification or regression
+        self.inputActivation = inputActivation
         self.outputActivation = outputActivation
+        self.earlyStoppingEpochs = earlyStoppingEpochs
 
         self.trainingSet = train
         self.validationSet = valid
@@ -72,28 +81,24 @@ class MultilayerPerceptron(Classifier):
         # e.g. plotting, reporting..
         self.performancesTraining = []
         self.performancesValidation = []
-
         self.layers = []
 
         # Build up the network from specific layers
         if not layers:
             # Input layer
-            inputActivation = "sigmoid"
             self.layers.append(LogisticLayer(train.input.shape[1], 128,
-                            None, inputActivation, False))
+                            None, self.inputActivation, False))
 
             # Output layer
             self.layers.append(LogisticLayer(128, 10,
                             None, self.outputActivation, True))
 
         else:
-            inputActivation = "sigmoid"
-
             nIn = train.input.shape[1]
 
             for layer in layers:
                 self.layers.append(LogisticLayer(nIn, layer,
-                            None, inputActivation, False))
+                            None, self.inputActivation, False))
                 nIn = layer
 
             self.layers.append(LogisticLayer(nIn, 10,
@@ -132,6 +137,7 @@ class MultilayerPerceptron(Classifier):
         for layer in self.layers:
             if layer != self._get_input_layer():
                 input = np.insert(input, 0, 1)
+
             input = layer.forward(input)
 
         return input
@@ -203,6 +209,25 @@ class MultilayerPerceptron(Classifier):
                       .format(accuracyValidation * 100))
                 print("-----------------------------")
 
+            if epoch > self.earlyStoppingEpochs:
+                noImprovement = 0
+
+                for i in range(1, self.earlyStoppingEpochs+1):
+                    currentPerf = self.performancesValidation[-i]
+                    prevPerf = self.performancesValidation[-(i+1)]
+
+                    if (currentPerf - prevPerf) < 0:
+                        noImprovement += 1
+
+                if noImprovement >= self.earlyStoppingEpochs:
+                    print("Early stopping, no improvement in validation set.")
+
+                    # resize epochs
+                    self.epochs = epoch + 1
+
+                    break
+
+
     def classify(self, test_instance):
         # Classify an instance given the model of the classifier
         # You need to implement something here
@@ -236,7 +261,7 @@ class MultilayerPerceptron(Classifier):
 
     def _get_encoded_label(self, label):
         zeros = np.zeros(10)
-        zeros[label] = 1
+        zeros[label] = 1.0
         return zeros
 
     def __del__(self):

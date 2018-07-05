@@ -57,8 +57,14 @@ class LogisticLayer():
 
         # You can have better initialization here
         if weights is None:
-            rns = np.random.RandomState(int(time.time()))
-            self.weights = rns.uniform(size=(nIn + 1, nOut))-0.5
+            if not 'relu' in activation:
+                rns = np.random.RandomState(int(time.time()))
+                self.weights = rns.uniform(size=(nIn + 1, nOut))-0.5
+            else:
+                # He uniform init
+                rns = np.random.RandomState(int(time.time()))
+                r = np.sqrt(6.0/(nIn))
+                self.weights = rns.uniform(-r, r,size=(nIn + 1, nOut))
         else:
             assert(weights.shape == (nIn + 1, nOut))
             self.weights = weights
@@ -145,11 +151,8 @@ class LogisticLayer():
         """
 
         # weight updating as gradient descent principle
-        for neuron in range(0, self.nOut):
-            self.weights[:, neuron] -= (learningRate *
-                                        self.deltas[neuron] *
-                                        self.inp)
-            self.weights[:, neuron] *= (1 - learningRate*weightDecayRate)
+        self.weights -= learningRate * (self.inp.reshape(-1, 1) * self.deltas.reshape(1, -1) -
+                                        self.weights * weightDecayRate)
 
     def _fire(self, inp):
         return self.activation(np.dot(inp, self.weights))

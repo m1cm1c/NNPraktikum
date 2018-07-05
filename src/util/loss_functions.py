@@ -106,7 +106,7 @@ class BinaryCrossEntropyError(Error):
         self.errorString = 'bce'
 
     def calculateError(self, target, output):
-        return np.sum(target*log(output) + (1-target)*log(1-output))
+        return np.sum(target*np.log(output) + (1-target)*np.log(1-output))
         
     def calculateDerivative(self, target, output):
         # BCEPrime = -target/output + (1-target)/(1-output)
@@ -123,7 +123,7 @@ class CrossEntropyError(Error):
 
     def calculateError(self, target, output):
         # https://datascience.stackexchange.com/questions/20296/cross-entropy-loss-explanation
-        return -np.log(np.dot(target, output))
+        return -np.log(np.dot(target, output).clip(min=0.0000000001))
         
     def calculateDerivative(self, target, output):
         # https://deepnotes.io/softmax-crossentropy

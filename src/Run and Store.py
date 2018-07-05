@@ -22,8 +22,13 @@ def main():
 
     numCores = 8
     Parallel(n_jobs=numCores)(delayed(process)(learningRate, weightDecayRate)
-                              for learningRate in [.1, .01, .001, .0001]
-                              for weightDecayRate in [.1, .01, .001, .0001, 0])
+                              for learningRate in [0.0025, 0.005, 0.01, 0.02,
+                                                   0.04, 0.08, 0.16]
+                              for weightDecayRate in [0.000001, 0.000002,
+                                                      0.000004, 0.000008,
+                                                      0.000016, 0.000032,
+                                                      0.000064, 0.000128,
+                                                      0.000256, 0.000512])
 
 def process(learningRate, weightDecayRate):
     data = MNISTSeven("../data/mnist_seven.csv", 3000, 1000, 1000,
@@ -33,7 +38,7 @@ def process(learningRate, weightDecayRate):
                                  data.testSet,
                                  learningRate=learningRate,
                                  weightDecayRate=weightDecayRate,
-                                 epochs=50,
+                                 epochs=500 ,
                                  loss='crossentropy',
                                  outputActivation='softmax')
     # Report the result #
