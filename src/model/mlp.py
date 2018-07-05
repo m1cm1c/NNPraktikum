@@ -17,7 +17,7 @@ class MultilayerPerceptron(Classifier):
     def __init__(self, train, valid, test, layers=None, inputWeights=None,
                  outputTask='classification', inputActivation='sigmoid',
                  outputActivation='softmax', loss='bce',
-                 learningRate=0.01, weightDecayRate=0, earlyStoppingEpochs=2,
+                 learningRate=0.01, weightDecayRate=0, earlyStoppingEpochs=5,
                  epochs=50):
 
         """
@@ -216,7 +216,7 @@ class MultilayerPerceptron(Classifier):
                     currentPerf = self.performancesValidation[-i]
                     prevPerf = self.performancesValidation[-(i+1)]
 
-                    if (currentPerf - prevPerf) < 0:
+                    if (currentPerf - prevPerf) < 0 or np.isclose(currentPerf, prevPerf, atol=0.001):
                         noImprovement += 1
 
                 if noImprovement >= self.earlyStoppingEpochs:
@@ -260,7 +260,7 @@ class MultilayerPerceptron(Classifier):
             self._update_weights(self.learningRate)
 
     def _get_encoded_label(self, label):
-        zeros = np.zeros(10)
+        zeros = np.zeros(self._get_output_layer().nOut)
         zeros[label] = 1.0
         return zeros
 
