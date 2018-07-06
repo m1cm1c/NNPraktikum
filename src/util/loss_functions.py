@@ -127,5 +127,4 @@ class CrossEntropyError(Error):
         
     def calculateDerivative(self, target, output):
         # https://deepnotes.io/softmax-crossentropy
-        # output is a prob vector whose sum = 1
-        return output - target
+        return -(target / output.clip(min=0.0000000001)) + (1.0 - target) / (1.0 - output).clip(min=0.0000000001)
