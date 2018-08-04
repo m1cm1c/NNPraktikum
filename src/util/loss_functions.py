@@ -123,8 +123,8 @@ class CrossEntropyError(Error):
 
     def calculateError(self, target, output):
         # https://datascience.stackexchange.com/questions/20296/cross-entropy-loss-explanation
-        return -np.log(np.dot(target, output).clip(min=0.0000000001))
+        return -np.dot(target, np.log(output).clip(min=0.0000000001))
         
     def calculateDerivative(self, target, output):
         # https://deepnotes.io/softmax-crossentropy
-        return -(target / output.clip(min=0.0000000001)) + (1.0 - target) / (1.0 - output).clip(min=0.0000000001)
+        return -(target / output.clip(min=0.0000000001))

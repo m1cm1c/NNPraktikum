@@ -80,9 +80,17 @@ class Activation:
         
     @staticmethod
     def softmaxPrime(netOutput):
-        # Here you have to code the softmax function
-        # https://deepnotes.io/softmax-crossentropy
-        return netOutput * (1 - netOutput)
+        #https://medium.com/@aerinykim/how-to-implement-the-softmax-derivative-independently-from-any-loss-function-ae6d44363a9d
+        jacobian_m = np.diag(netOutput)
+
+        for i in range(len(jacobian_m)):
+            for j in range(len(jacobian_m)):
+                if i == j:
+                    jacobian_m[i][j] = netOutput[i] * (1-netOutput[i])
+                else: 
+                    jacobian_m[i][j] = -netOutput[i]*netOutput[j]
+
+        return jacobian_m
         
     @staticmethod
     def getActivation(str):
